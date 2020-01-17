@@ -5,69 +5,58 @@ const Constant = {
     ROW_UNIT: 83,
 }
 
-// Enemies our player must avoid
-var Enemy = function() {
-    // The image/sprite for our enemies, this uses a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-    this.init();
-};
-
-Enemy.prototype.init = function() {
-    // set initial location
-    this.x = 0; //-Math.floor(Math.random * MAX_WIDTH);
-    this.y = 100 * Math.floor(Math.random() * 5);
-    // set speed
-    this.speed = 100 * (Math.floor(Math.random() * 3) +1);
-};
-
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    if (this.x > Constant.MAX_WIDTH + 100) {
-        this.init();
-        return;
-    }
-    this.x = this.x  + (this.speed * dt);
-};
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-/*
 class Creature {
     constructor() {
-        console.log('Creature created');
         this.x = 0;
         this.y = 0;
+        this.reset();
     }
 
-    update() {
-        console.log('update call');
+    reset() {
+    }
+
+    update(dt) {
     }
 
     render() {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-        console.log('render call');
     }
 }
-*/
-class Player {
+
+class Enemy extends Creature {
     constructor() {
+        super();
+        this.sprite = 'images/enemy-bug.png';
+    }
+
+    reset() {
+        this.x = 0;
+        this.y = 100 * Math.floor(Math.random() * 5);
+        this.speed = 100 * (Math.floor(Math.random() * 3) +1);
+    }
+
+    update(dt) {
+        if (this.x > Constant.MAX_WIDTH + 100) {
+            this.reset();
+            return;
+        }
+        this.x = this.x  + (this.speed * dt);
+    }
+}
+
+class Player extends Creature {
+    constructor() {
+        super();
         this.sprite = 'images/char-boy.png';
+    }
+
+    reset() {
         this.x = Constant.COL_UNIT * Math.floor(Math.random() * 5);
         this.y = Constant.ROW_UNIT * (Math.floor(Math.random() * 2) +4);
         this.isMovePressed = false;
     }
 
-    update() {
+    update(dt) {
         if (!this.isMovePressed)
             return;
         this.x += this.bufferX;
@@ -102,9 +91,6 @@ class Player {
                 break;  
         }
     }
-    render() {
-        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    }
 }
 
 
@@ -126,6 +112,6 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-    // e.preventDefault();
+
     player.handleInput(allowedKeys[e.keyCode]);
 });
