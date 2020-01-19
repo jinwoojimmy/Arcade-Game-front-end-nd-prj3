@@ -1,8 +1,10 @@
 const Constant = {
     MAX_HEIGHT: 606,
     MAX_WIDTH: 505,
-    COL_UNIT: 101,
-    ROW_UNIT: 83,
+    COL_UNIT: 101, // x-axis move unit
+    ROW_UNIT: 83, // y-axis move unit 
+    CREATURE_HEIGHT: 101 / 2,
+    CREATURE_WIDTH: 101,
 }
 
 class Creature {
@@ -31,7 +33,7 @@ class Enemy extends Creature {
 
     reset() {
         this.x = 0;
-        this.y = 100 * Math.floor(Math.random() * 5);
+        this.y = Constant.ROW_UNIT * (Math.floor(Math.random() * 3) + 1);
         this.speed = 100 * (Math.floor(Math.random() * 3) +1);
     }
 
@@ -48,6 +50,8 @@ class Player extends Creature {
     constructor() {
         super();
         this.sprite = 'images/char-boy.png';
+        this.celebrationSprite = 'images/Selector.png';
+        this.isWin = false; 
     }
 
     reset() {
@@ -56,12 +60,30 @@ class Player extends Creature {
         this.isMovePressed = false;
     }
 
-    update(dt) {
+    update() {
         if (!this.isMovePressed)
             return;
         this.x += this.bufferX;
         this.y += this.bufferY;
+
+        if (this.y === 0)
+            this.isWin = true;
         this.isMovePressed = false;
+    }
+
+    checkCollide(enemy) {
+        if (this.x < enemy.x + Constant.CREATURE_WIDTH
+                && this.x > enemy.x - Constant.CREATURE_WIDTH 
+                && this.y < enemy.y + Constant.CREATURE_HEIGHT
+                && this.y > enemy.y - Constant.CREATURE_HEIGHT)
+            this.reset();
+    }
+
+    render() {
+        super.render();
+        if (this.isWin) {
+            ctx.drawImage(Resources.get(this.celebrationSprite), this.x, this.y);
+        }
     }
 
     handleInput(allowedKey) {
@@ -99,7 +121,8 @@ class Player extends Creature {
 // Place the player object in a variable called player
 const enemy1 = new Enemy();
 const enemy2 = new Enemy();
-const allEnemies = [enemy1, enemy2];
+const enemy3 = new Enemy();
+const allEnemies = [enemy1, enemy2, enemy3];
 const player = new Player();
 
 

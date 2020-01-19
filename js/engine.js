@@ -78,8 +78,18 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
+        if (!allEnemies.length) {
+            return;
+        }
+        if (player.isWin) {
+            allEnemies.length = 0;
+            setTimeout(() => {
+                const ans = confirm('You won! Do you want to play again?');
+                if (ans) window.location.reload();
+            }, 500);
+        }
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
     }
 
     /* This is called by the update function and loops through all of the
@@ -95,6 +105,12 @@ var Engine = (function(global) {
         });
         player.update();
     }
+
+    function checkCollisions() {
+        allEnemies.forEach(function(enemy) {
+            player.checkCollide(enemy);
+        });
+    };
 
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
@@ -173,7 +189,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/Selector.png'
     ]);
     Resources.onReady(init);
 
